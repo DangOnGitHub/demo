@@ -1,0 +1,128 @@
+openapi: 3.1.0
+info:
+  title: Techcombank
+  version: '1.0'
+  contact:
+    name: Dang Doan
+    email: dang.doan.developer@gmail.com
+  description: Demo API for Techcombank
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /pools:
+    post:
+      summary: Create or Update Pool
+      operationId: post-pools
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                required:
+                  - status
+              examples:
+                Created a new pool:
+                  value:
+                    status: inserted
+                Updated an existing pool:
+                  value:
+                    status: appended
+        '422':
+          $ref: '#/components/responses/InvalidParams'
+      description: Create a new pool or update an existing pool.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                poolId:
+                  type: integer
+                  example: 123456
+                poolValues:
+                  type: array
+                  items:
+                    type: integer
+              required:
+                - poolId
+                - poolValues
+            examples:
+              Create a pool:
+                value:
+                  poolId: 123456
+                  poolValues:
+                    - 1
+                    - 7
+                    - 2
+                    - 6
+  'pools/{poolId}/percentiles':
+    post:
+      summary: Query Quantile
+      operationId: post-percentiles
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quantile:
+                    type: number
+                  count:
+                    type: integer
+                required:
+                  - quantile
+                  - count
+        '404':
+          description: Not Found
+      description: Query a quantile (in percentile form)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                poolId:
+                  type: integer
+                  example: 123456
+                percentile:
+                  type: number
+                  minimum: 0
+                  maximum: 100
+                  example: 99.5
+              required:
+                - poolId
+                - percentile
+    parameters:
+      - schema:
+          type: string
+        name: poolId
+        in: path
+        required: true
+components:
+  schemas: {}
+  responses:
+    InvalidParams:
+      description: An error indicating invalid parameters in request body or parameters.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              invalidParams:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    reason:
+                      type: string
